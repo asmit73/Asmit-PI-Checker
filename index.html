@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PI Control Center</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#f5f7fb;
+    color:#111827;
+}
+
+.sidebar{
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:240px;
+    background:#111827;
+    color:white;
+    padding:25px 15px;
+}
+
+.logo{
+    font-size:21px;
+    font-weight:bold;
+    margin-bottom:30px;
+}
+
+.logo span{
+    background:#2563eb;
+    padding:9px;
+    border-radius:9px;
+    margin-right:8px;
+}
+
+.nav button{
+    width:100%;
+    border:0;
+    background:transparent;
+    color:#cbd5e1;
+    padding:13px;
+    margin:3px 0;
+    border-radius:8px;
+    text-align:left;
+    cursor:pointer;
+}
+
+.nav button:hover,
+.nav button.active{
+    background:#1f2937;
+    color:white;
+}
+
+.main{
+    margin-left:240px;
+    padding:30px;
+}
+
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.header h1{
+    margin:0;
+    font-size:28px;
+}
+
+.header p{
+    color:#667085;
+}
+
+.btn{
+    border:0;
+    border-radius:8px;
+    padding:10px 15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.primary{
+    background:#2563eb;
+    color:white;
+}
+
+.light{
+    background:white;
+    border:1px solid #e5e7eb;
+}
+
+.danger{
+    background:#fef2f2;
+    color:#dc2626;
+}
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.stat{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:20px;
+}
+
+.stat-title{
+    color:#667085;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.stat-number{
+    font-size:30px;
+    font-weight:bold;
+    margin-top:8px;
+}
+
+.card{
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.card h2{
+    margin-top:0;
+}
+
+.reminder{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:10px;
+    border-left:5px solid #2563eb;
+    background:#eff6ff;
+}
+
+.reminder.today{
+    border-left-color:#b45309;
+    background:#fffbeb;
+}
+
+.reminder.overdue{
+    border-left-color:#dc2626;
+    background:#fef2f2;
+}
+
+.reminder-title{
+    font-weight:bold;
+}
+
+.reminder-info{
+    color:#667085;
+    font-size:13px;
+    margin-top:5px;
+}
+
+.sent-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px;
+    background:#ecfdf3;
+    border-left:5px solid #15803d;
+    border-radius:9px;
+    margin-bottom:9px;
+}
+
+.sent-report{
+    font-weight:bold;
+}
+
+.sent-date{
+    color:#667085;
+    font-size:13px;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:15px;
+}
+
+.field label{
+    display:block;
+    font-weight:bold;
+    font-size:13px;
+    margin-bottom:6px;
+}
+
+.field input{
+    width:100%;
+    padding:11px;
+    border:1px solid #d1d5db;
+    border-radius:8px;
+}
+
+.form-actions{
+    margin-top:18px;
+}
+
+.table-wrap{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:850px;
+}
+
+th,td{
+    padding:13px 10px;
+    border-bottom:1px solid #e5e7eb;
+    text-align:left;
+    font-size:13px;
+}
+
+th{
+    background:#f9fafb;
+    color:#667085;
+}
+
+.badge{
+    display:inline-block;
+    padding:5px 9px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:bold;
+}
+
+.badge.pending{
+    background:#fffbeb;
+    color:#b45309;
+}
+
+.badge.overdue{
+    background:#fef2f2;
+    color:#dc2626;
+}
+
+.badge.sent{
+    background:#ecfdf3;
+    color:#15803d;
+}
+
+.search{
+    max-width:300px;
+    width:100%;
+    padding:10px;
+    border:1px solid #e5e7eb;
+    border-radius:8px;
+}
+
+.toolbar{
+    display:flex;
+    justify-content:space-between;
+    gap:15px;
+    margin-bottom:15px;
+}
+
+.empty{
+    text-align:center;
+    padding:30px;
+    color:#667085;
+}
+
+.hidden{
+    display:none;
+}
+
+.toast{
+    position:fixed;
+    right:20px;
+    bottom:20px;
+    background:#111827;
+    color:white;
+    padding:12px 17px;
+    border-radius:8px;
+    display:none;
+}
+
+@media(max-width:900px){
+
+    .sidebar{
+        display:none;
+    }
+
+    .main{
+        margin-left:0;
+        padding:18px;
+    }
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+    .form-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:550px){
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .reminder,
+    .sent-item{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:10px;
+    }
+}
+</style>
+</head>
+
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo">
+        <span>PI</span>
+        Control Center
+    </div>
+
+    <div class="nav">
+
+        <button id="nav-home"
+                class="active"
+                onclick="showPage('home')">
+            ◷ &nbsp; PI Reminders
+        </button>
+
+        <button id="nav-details"
+                onclick="showPage('details')">
+            ▤ &nbsp; All Details
+        </button>
+
+        <button id="nav-add"
+                onclick="showPage('add')">
+            ＋ &nbsp; Add Report
+        </button>
+
+    </div>
+
+</div>
+
+
+<main class="main">
+
+<div class="header">
+
+    <div>
+        <h1 id="pageTitle">
+            PI Reminders
+        </h1>
+
+        <p id="dateLabel"></p>
+    </div>
+
+    <div>
+
+        <button
+            class="btn light"
+            onclick="exportCSV()">
+            Export CSV
+        </button>
+
+        <button
+            class="btn primary"
+            onclick="showPage('add')">
+            + Add Report
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= HOME ================= -->
+
+<section id="home">
+
+<div class="stats">
+
+    <div class="stat">
+        <div class="stat-title">
+            Due Today
+        </div>
+
+        <div
+            class="stat-number"
+            id="dueToday">
+            0
+        </div>
+    </div>
+
+
+    <div class="stat">
+        <div class="stat-title">
+            Overdue
+        </div>
+
+        <div
+            class="stat-number"
+            id="overdue">
+            0
+        </div>
+    </div>
+
+
+    <div class="stat">
+        <div class="stat-title">
+            Pending
+        </div>
+
+        <div
+            class="stat-number"
+            id="pending">
+            0
+        </div>
+    </div>
+
+
+    <div class="stat">
+        <div class="stat-title">
+            PI Sent
+        </div>
+
+        <div
+            class="stat-number"
+            id="sent">
+            0
+        </div>
+    </div>
+
+</div>
+
+
+<!-- PI REMINDER -->
+
+<div class="card">
+
+    <h2>
+        PI Send Queue
+    </h2>
+
+    <div id="reminders"></div>
+
+</div>
+
+
+<!-- PI SENT -->
+
+<div class="card">
+
+    <h2>
+        🟢 PI Sent
+    </h2>
+
+    <div id="sentReports"></div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= DETAILS ================= -->
+
+<section
+    id="details"
+    class="hidden">
+
+<div class="card">
+
+    <div class="toolbar">
+
+        <h2>
+            All Report Details
+        </h2>
+
+        <input
+            class="search"
+            id="search"
+            placeholder="Search report number..."
+            oninput="renderDetails()">
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Report Number
+                    </th>
+
+                    <th>
+                        Login Date
+                    </th>
+
+                    <th>
+                        Results Date
+                    </th>
+
+                    <th>
+                        PI Send Date
+                    </th>
+
+                    <th>
+                        Status
+                    </th>
+
+                    <th>
+                        PI Sent Date
+                    </th>
+
+                    <th>
+                        Action
+                    </th>
+
+                </tr>
+
+            </thead>
+
+            <tbody
+                id="tableBody">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= ADD REPORT ================= -->
+
+<section
+    id="add"
+    class="hidden">
+
+<div class="card">
+
+    <h2>
+        Add New Report
+    </h2>
+
+
+    <form
+        id="reportForm">
+
+        <div class="form-grid">
+
+
+            <div class="field">
+
+                <label>
+                    Report Number
+                </label>
+
+                <input
+                    id="reportNo"
+                    placeholder="Example: DELY26001156"
+                    required>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Login Date
+                </label>
+
+                <input
+                    id="loginDate"
+                    type="date"
+                    required>
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Results Date
+                </label>
+
+                <input
+                    id="resultsDate"
+                    type="date"
+                    required>
+
+            </div>
+
+
+        </div>
+
+
+        <p>
+            PI Send Date is automatically
+            calculated as
+            <strong>
+                Login Date + 1 Day
+            </strong>.
+        </p>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn primary">
+
+                Save Report
+
+            </button>
+
+
+            <button
+                type="reset"
+                class="btn light">
+
+                Clear
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+</section>
+
+</main>
+
+
+<div
+    class="toast"
+    id="toast">
+</div>
+
+
+
+<script>
+
+/* =====================================
+   STORAGE
+===================================== */
+
+const STORAGE_KEY =
+    "PI_CONTROL_CENTER_DATA";
+
+
+let reports =
+    JSON.parse(
+        localStorage.getItem(
+            STORAGE_KEY
+        ) || "[]"
+    );
+
+
+
+/* =====================================
+   SAVE
+===================================== */
+
+function saveData(){
+
+    localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(reports)
+    );
+
+}
+
+
+
+/* =====================================
+   TODAY
+===================================== */
+
+function getToday(){
+
+    const d = new Date();
+
+    d.setHours(
+        0,
+        0,
+        0,
+        0
+    );
+
+    return new Date(
+        d.getTime()
+        -
+        d.getTimezoneOffset()
+        *
+        60000
+    )
+    .toISOString()
+    .slice(
+        0,
+        10
+    );
+
+}
+
+
+
+/* =====================================
+   ADD ONE DAY
+===================================== */
+
+function addOneDay(date){
+
+    const d =
+        new Date(
+            date + "T00:00:00"
+        );
+
+    d.setDate(
+        d.getDate() + 1
+    );
+
+    return d
+        .toISOString()
+        .slice(
+            0,
+            10
+        );
+
+}
+
+
+
+/* =====================================
+   DATE FORMAT
+===================================== */
+
+function formatDate(date){
+
+    if(!date){
+        return "—";
+    }
+
+    return new Date(
+        date + "T00:00:00"
+    )
+    .toLocaleDateString(
+        "en-GB",
+        {
+            day:"2-digit",
+            month:"short",
+            year:"numeric"
+        }
+    );
+
+}
+
+
+
+/* =====================================
+   HTML SECURITY
+===================================== */
+
+function escapeHTML(value){
+
+    return String(value)
+        .replace(
+            /[&<>"']/g,
+            function(c){
+
+                return {
+                    "&":"&amp;",
+                    "<":"&lt;",
+                    ">":"&gt;",
+                    '"':"&quot;",
+                    "'":"&#039;"
+                }[c];
+
+            }
+        );
+
+}
+
+
+
+/* =====================================
+   STATUS
+===================================== */
+
+function getStatus(report){
+
+    if(report.sent){
+        return "sent";
+    }
+
+    if(
+        report.piDate <
+        getToday()
+    ){
+        return "overdue";
+    }
+
+    return "pending";
+
+}
+
+
+function getStatusText(report){
+
+    const status =
+        getStatus(report);
+
+
+    if(status === "sent"){
+        return "🟢 Sent";
+    }
+
+    if(status === "overdue"){
+        return "🔴 Overdue";
+    }
+
+    return "🟠 Pending";
+
+}
+
+
+
+/* =====================================
+   PAGE NAVIGATION
+===================================== */
+
+function showPage(page){
+
+    document
+        .getElementById("home")
+        .classList
+        .toggle(
+            "hidden",
+            page !== "home"
+        );
+
+
+    document
+        .getElementById("details")
+        .classList
+        .toggle(
+            "hidden",
+            page !== "details"
+        );
+
+
+    document
+        .getElementById("add")
+        .classList
+        .toggle(
+            "hidden",
+            page !== "add"
+        );
+
+
+    document
+        .getElementById("nav-home")
+        .classList
+        .toggle(
+            "active",
+            page === "home"
+        );
+
+
+    document
+        .getElementById("nav-details")
+        .classList
+        .toggle(
+            "active",
+            page === "details"
+        );
+
+
+    document
+        .getElementById("nav-add")
+        .classList
+        .toggle(
+            "active",
+            page === "add"
+        );
+
+
+    if(page === "home"){
+
+        document.getElementById(
+            "pageTitle"
+        ).textContent =
+            "PI Reminders";
+
+        renderHome();
+
+    }
+
+
+    if(page === "details"){
+
+        document.getElementById(
+            "pageTitle"
+        ).textContent =
+            "All Report Details";
+
+        renderDetails();
+
+    }
+
+
+    if(page === "add"){
+
+        document.getElementById(
+            "pageTitle"
+        ).textContent =
+            "Add New Report";
+
+    }
+
+}
+
+
+
+/* =====================================
+   ADD REPORT
+===================================== */
+
+document
+    .getElementById("reportForm")
+    .addEventListener(
+        "submit",
+        function(e){
+
+            e.preventDefault();
+
+
+            const reportNo =
+                document
+                .getElementById("reportNo")
+                .value
+                .trim();
+
+
+            const loginDate =
+                document
+                .getElementById("loginDate")
+                .value;
+
+
+            const resultsDate =
+                document
+                .getElementById("resultsDate")
+                .value;
+
+
+            const duplicate =
+                reports.some(
+                    report =>
+                    report.reportNo
+                    .toLowerCase()
+                    ===
+                    reportNo
+                    .toLowerCase()
+                );
+
+
+            if(duplicate){
+
+                showToast(
+                    "Report number already exists."
+                );
+
+                return;
+
+            }
+
+
+            const report = {
+
+                id:
+                    Date.now().toString(),
+
+                reportNo:
+                    reportNo,
+
+                loginDate:
+                    loginDate,
+
+                resultsDate:
+                    resultsDate,
+
+                piDate:
+                    addOneDay(
+                        loginDate
+                    ),
+
+                sent:
+                    false,
+
+                piSentDate:
+                    ""
+
+            };
+
+
+            reports.push(
+                report
+            );
+
+
+            saveData();
+
+
+            this.reset();
+
+
+            showToast(
+                "Report added successfully."
+            );
+
+
+            showPage(
+                "home"
+            );
+
+        }
+    );
+
+
+
+/* =====================================
+   HOME
+===================================== */
+
+function renderHome(){
+
+    const today =
+        getToday();
+
+
+    const pendingReports =
+        reports
+        .filter(
+            report =>
+            !report.sent
+        )
+        .sort(
+            (a,b) =>
+            a.piDate
+            .localeCompare(
+                b.piDate
+            )
+        );
+
+
+    const sentReports =
+        reports
+        .filter(
+            report =>
+            report.sent
+        )
+        .sort(
+            (a,b) =>
+            b.piSentDate
+            .localeCompare(
+                a.piSentDate
+            )
+        );
+
+
+    document.getElementById(
+        "dueToday"
+    ).textContent =
+        pendingReports.filter(
+            r =>
+            r.piDate === today
+        ).length;
+
+
+    document.getElementById(
+        "overdue"
+    ).textContent =
+        pendingReports.filter(
+            r =>
+            r.piDate < today
+        ).length;
+
+
+    document.getElementById(
+        "pending"
+    ).textContent =
+        pendingReports.length;
+
+
+    document.getElementById(
+        "sent"
+    ).textContent =
+        sentReports.length;
+
+
+
+    /* REMINDERS */
+
+    const reminderBox =
+        document.getElementById(
+            "reminders"
+        );
+
+
+    if(
+        pendingReports.length === 0
+    ){
+
+        reminderBox.innerHTML =
+            `
+            <div class="empty">
+                🎉 No pending PI reminders.
+            </div>
+            `;
+
+    }
+    else{
+
+        reminderBox.innerHTML =
+            pendingReports
+            .map(
+                report => {
+
+                    let cls =
+                        "reminder";
+
+                    let message;
+
+
+                    if(
+                        report.piDate <
+                        today
+                    ){
+
+                        cls +=
+                            " overdue";
+
+                        message =
+                            "PI is overdue";
+
+                    }
+                    else if(
+                        report.piDate ===
+                        today
+                    ){
+
+                        cls +=
+                            " today";
+
+                        message =
+                            "PI is due today";
+
+                    }
+                    else{
+
+                        message =
+                            "PI is due " +
+                            formatDate(
+                                report.piDate
+                            );
+
+                    }
+
+
+                    return `
+
+                    <div class="${cls}">
+
+                        <div>
+
+                            <div
+                                class="reminder-title">
+
+                                ${escapeHTML(
+                                    report.reportNo
+                                )}
+
+                            </div>
+
+
+                            <div
+                                class="reminder-info">
+
+                                ${message}
+
+                                · Login:
+                                ${formatDate(
+                                    report.loginDate
+                                )}
+
+                                · Results:
+                                ${formatDate(
+                                    report.resultsDate
+                                )}
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="btn primary"
+                            onclick="markSent('${report.id}')">
+
+                            Mark PI Sent
+
+                        </button>
+
+                    </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+    }
+
+
+
+    /* SENT REPORTS */
+
+    const sentBox =
+        document.getElementById(
+            "sentReports"
+        );
+
+
+    if(
+        sentReports.length === 0
+    ){
+
+        sentBox.innerHTML =
+            `
+            <div class="empty">
+                No PI has been sent yet.
+            </div>
+            `;
+
+    }
+    else{
+
+        sentBox.innerHTML =
+            sentReports
+            .map(
+                report => {
+
+                    return `
+
+                    <div class="sent-item">
+
+                        <div>
+
+                            <div
+                                class="sent-report">
+
+                                ${escapeHTML(
+                                    report.reportNo
+                                )}
+
+                            </div>
+
+
+                            <div
+                                class="sent-date">
+
+                                PI Sent:
+                                ${formatDate(
+                                    report.piSentDate
+                                )}
+
+                            </div>
+
+                        </div>
+
+
+                        <span
+                            class="badge sent">
+
+                            🟢 Sent
+
+                        </span>
+
+                    </div>
+
+                    `;
+
+                }
+            )
+            .join("");
+
+    }
+
+}
+
+
+
+/* =====================================
+   MARK SENT
+===================================== */
+
+function markSent(id){
+
+    const report =
+        reports.find(
+            r =>
+            r.id === id
+        );
+
+
+    if(!report){
+        return;
+    }
+
+
+    report.sent =
+        true;
+
+
+    report.piSentDate =
+        getToday();
+
+
+    saveData();
+
+
+    showToast(
+        "PI marked as sent."
+    );
+
+
+    renderHome();
+
+    renderDetails();
+
+}
+
+
+
+/* =====================================
+   DETAILS
+===================================== */
+
+function renderDetails(){
+
+    const search =
+        (
+            document
+            .getElementById("search")
+            ?.value
+            || ""
+        )
+        .toLowerCase();
+
+
+    const filtered =
+        reports.filter(
+            report =>
+            report.reportNo
+            .toLowerCase()
+            .includes(search)
+        );
+
+
+    const tableBody =
+        document.getElementById(
+            "tableBody"
+        );
+
+
+    if(
+        filtered.length === 0
+    ){
+
+        tableBody.innerHTML =
+            `
+            <tr>
+
+                <td
+                    colspan="7"
+                    class="empty">
+
+                    No reports found.
+
+                </td>
+
+            </tr>
+            `;
+
+        return;
+
+    }
+
+
+    tableBody.innerHTML =
+        filtered
+        .map(
+            report => {
+
+                const status =
+                    getStatus(
+                        report
+                    );
+
+
+                return `
+
+                <tr>
+
+                    <td>
+
+                        <strong>
+
+                            ${escapeHTML(
+                                report.reportNo
+                            )}
+
+                        </strong>
+
+                    </td>
+
+
+                    <td>
+                        ${formatDate(
+                            report.loginDate
+                        )}
+                    </td>
+
+
+                    <td>
+                        ${formatDate(
+                            report.resultsDate
+                        )}
+                    </td>
+
+
+                    <td>
+                        ${formatDate(
+                            report.piDate
+                        )}
+                    </td>
+
+
+                    <td>
+
+                        <span
+                            class="badge ${status}">
+
+                            ${getStatusText(
+                                report
+                            )}
+
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        ${formatDate(
+                            report.piSentDate
+                        )}
+
+                    </td>
+
+
+                    <td>
+
+                        ${
+                            !report.sent
+                            ?
+                            `
+                            <button
+                                class="btn primary"
+                                onclick="markSent('${report.id}')">
+
+                                Mark Sent
+
+                            </button>
+                            `
+                            :
+                            ""
+                        }
+
+
+                        <button
+                            class="btn danger"
+                            onclick="deleteReport('${report.id}')">
+
+                            Delete
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+                `;
+
+            }
+        )
+        .join("");
+
+}
+
+
+
+/* =====================================
+   DELETE
+===================================== */
+
+function deleteReport(id){
+
+    if(
+        !confirm(
+            "Are you sure you want to delete this report?"
+        )
+    ){
+
+        return;
+
+    }
+
+
+    reports =
+        reports.filter(
+            report =>
+            report.id !== id
+        );
+
+
+    saveData();
+
+
+    renderHome();
+
+    renderDetails();
+
+
+    showToast(
+        "Report deleted."
+    );
+
+}
+
+
+
+/* =====================================
+   EXPORT CSV
+===================================== */
+
+function exportCSV(){
+
+    if(
+        reports.length === 0
+    ){
+
+        showToast(
+            "No data to export."
+        );
+
+        return;
+
+    }
+
+
+    const headers = [
+
+        "Report Number",
+        "Login Date",
+        "Results Date",
+        "PI Send Date",
+        "PI Status",
+        "PI Sent Date"
+
+    ];
+
+
+    const rows =
+        reports.map(
+            report => [
+
+                report.reportNo,
+
+                report.loginDate,
+
+                report.resultsDate,
+
+                report.piDate,
+
+                getStatusText(
+                    report
+                ),
+
+                report.piSentDate
+
+            ]
+        );
+
+
+    const csv =
+        [headers,...rows]
+        .map(
+            row =>
+            row
+            .map(
+                value =>
+                `"${String(value)
+                .replace(/"/g,'""')}"`
+            )
+            .join(",")
+        )
+        .join("\n");
+
+
+    const blob =
+        new Blob(
+            [csv],
+            {
+                type:
+                "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    link.download =
+        "PI_Report_Dashboard.csv";
+
+
+    link.click();
+
+}
+
+
+
+/* =====================================
+   TOAST
+===================================== */
+
+function showToast(message){
+
+    const toast =
+        document.getElementById(
+            "toast"
+        );
+
+
+    toast.textContent =
+        message;
+
+
+    toast.style.display =
+        "block";
+
+
+    setTimeout(
+        function(){
+
+            toast.style.display =
+                "none";
+
+        },
+        2500
+    );
+
+}
+
+
+
+/* =====================================
+   START
+===================================== */
+
+document.getElementById(
+    "dateLabel"
+).textContent =
+    "Today · " +
+    formatDate(
+        getToday()
+    );
+
+
+renderHome();
+
+</script>
+
+</body>
+</html>
